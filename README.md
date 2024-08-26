@@ -1,39 +1,71 @@
-<!-- 
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+# jaspr_html_to_component
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/tools/pub/writing-package-pages). 
+Simple dart package that converts HTML strings into **[Jaspr]**(https://github.com/schultek/jaspr) Components
 
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/to/develop-packages). 
--->
+## Setup
+To get started, add the package as a dev dependency to your project:
 
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
-
-## Features
-
-TODO: List what your package can do. Maybe include images, gifs, or videos.
-
-## Getting started
-
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+dart pub add jaspr_html_to_component
 
 ## Usage
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder. 
+```
+import 'dart:convert';
 
-```dart
-const like = 'sample';
+import 'package:jaspr/jaspr.dart';
+import 'package:jaspr_html_to_component/jaspr_html_to_component.dart'
+
+@client
+class Page extends StatelessComponent {
+  
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    
+    var test = "<bold><a href='/'>Hello World!</a></bold>";
+    yield HtmlToComponent(test);
+
+    }
+        
+}
+
+Component convertHtmlToComponent(dom.Node node) {
+  print("Conerting html to component");
+  print(node);
+  if (node is dom.Element) {
+    return DomComponent(
+      tag: node.localName ?? 'div',
+      classes: node.classes.isNotEmpty ? node.classes.toList().join(' ') : null,
+      attributes: node.attributes.isNotEmpty
+          ? Map<String, String>.from(node.attributes)
+          : null,
+      children: node.nodes
+          .map(convertHtmlToComponent)
+          .whereType<Component>()
+          .toList(),
+    );
+  } else if (node is dom.Text) {
+    return Text(node.text);
+  }
+  return DomComponent(tag: 'div'); // Fallback to a default component
+}
+
+class HtmlToComponent extends StatelessComponent {
+  final String htmlString;
+
+  HtmlToComponent(this.htmlString);
+
+  @override
+  Iterable<Component> build(BuildContext context) sync* {
+    var document = html_parser.parse(htmlString);
+    var body = document.body;
+
+    if (body != null) {
+      yield convertHtmlToComponent(body);
+    }
+  }
+}
+
+
 ```
 
-## Additional information
-
-TODO: Tell users more about the package: where to find more information, how to 
-contribute to the package, how to file issues, what response they can expect 
-from the package authors, and more.
+Thanks for using it =)

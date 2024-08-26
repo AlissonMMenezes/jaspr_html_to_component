@@ -1,7 +1,7 @@
 name: jaspr_html_to_component
 description: Convert any HTML String into Jaspr Components
-version: 0.0.1
-# repository: https://github.com/my_org/my_repo
+version: 0.0.2
+repository: https://github.com/AlissonMMenezes/jaspr_html_to_component
 
 environment:
   sdk: ^3.5.1
